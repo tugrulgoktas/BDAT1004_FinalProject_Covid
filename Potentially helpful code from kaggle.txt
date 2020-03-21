@@ -1,0 +1,4 @@
+#code that could be used to help with different graphics:
+#and possibly to modify/improve the data frames (and, by extension, database)
+
+https://www.kaggle.com/paultimothymooney/does-latitude-impact-the-spread-of-covid-19
