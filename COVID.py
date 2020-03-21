@@ -4,37 +4,13 @@ import numpy as np
 import pyodbc
 import urllib
 from sqlalchemy import create_engine
-import pymysql
-import gviz_api
+import openpyxl
 
-#getdata from WHO source
-#convert data into bytes variable "rawdata"
-rawdata=b''
-mysock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-mysock.connect(('covid.ourworldindata.org', 80))
-cmd = 'GET https://covid.ourworldindata.org/data/new_cases.csv HTTP/1.0\r\n\r\n'.encode()
-mysock.send(cmd)
-while True:
-    data = mysock.recv(512)
-    rawdata = rawdata + data 
-    if len(data) < 1:  
-        break  
-mysock.close()
-
-#convert data to list with header removed
-mydata=rawdata.decode()
-headerpos = mydata.find("\r\n\r\n")
-mydata=mydata[headerpos:]
-test=mydata.splitlines()
-test.pop(0)
-test.pop(0)
-data_list=[]
-for line in test:
-    data_list.append(line.split(','))
-  
-#create dataframe from list
-df=pd.DataFrame(data_list)
-print(df)
+#connect to the data source and create a dataframe
+#change column names to avoid SQL errors later
+link = 'http://www.ecdc.europa.eu/sites/default/files/documents/COVID-19-geographic-disbtribution-worldwide-2020-03-21.xlsx'
+df = pd.read_excel(link)
+df = df.rename(columns={'Countries and territories':'Countries'})
 
 #Connect to a SQL Server
 server = 'mysqlerverrr.database.windows.net'
@@ -50,6 +26,4 @@ print("connection is ok")
 #create SQL Table on Azure server
 df.to_sql('covid', con = engine,if_exists='replace' ,chunksize = 1000)
 print("table created")
-
-
 
